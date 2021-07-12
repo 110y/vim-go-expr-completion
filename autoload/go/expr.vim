@@ -36,12 +36,21 @@ function! go#expr#complete() abort
         end
     else
         let first_line = printf('%s := %s', values.values[0].name, trim(start_line_text, "\t"))
+        let end_char = start_line_text[len(start_line_text) - 1]
 
         if values.values[0].type ==# 'error'
-            let first_line = printf('%sif %s; %s != nil {', start_line_tabs, first_line, values.values[0].name)
-            let following_lines = [
-                        \   printf('%s}', start_line_tabs)
-                        \ ]
+            if end_char ==# '{'
+                let first_line = [printf('%s%s', start_line_tabs, first_line)]
+                let following_lines = [
+                            \   printf('%sif %s != nil{', start_line_tabs, values.values[0].name),
+                            \   printf('%s}', start_line_tabs),
+                            \ ]
+            else
+                let first_line = printf('%sif %s; %s != nil {', start_line_tabs, first_line, values.values[0].name)
+                let following_lines = [
+                            \   printf('%s}', start_line_tabs)
+                            \ ]
+            end
         else
             let first_line = [printf('%s%s', start_line_tabs, first_line)]
         endif
